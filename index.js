@@ -1,40 +1,54 @@
-// const fs = require("fs");
-// Sync way, dont use it
-// const textIn = fs.readFileSync("./txt/input.txt", "utf-8");
-// console.log(textIn);
+const fs = require('fs');
+const http = require('http');
+const url = require('url');
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const products = JSON.parse(data);
 
-// const textOut = `This is what we know about avocado: ${textIn}.\nCreated on ${Date.now()}`;
-// fs.writeFileSync("./txt/output.txt", textOut);
+const replaceTemplate = require('./modules/replaceTemplate');
 
-// Async
+const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
+const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
+const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
 
-// fs.readFile("./txt/start.txt", "utf-8", (err, data) => {
-//   console.log("second");
-//   if (err) return;
-//   //console.log(data);
-//   fs.readFile(`./txt/${data}.txt`, "utf-8", (err2, data2) => {
-//     console.log(data2);
-//     fs.readFile("./txt/append.txt", "utf-8", (err, data3) => {
-//       console.log(data3);
+const server = http.createServer((req, response) => {
+  const { query, pathname } = url.parse(req.url, true);
 
-//       fs.writeFile("./txt/final.txt", `${data2}\n${data3}`, "utf-8", (err) => {
-//         if (!err) {
-//           console.log("write done!");
-//         }
-//       });
-//     });
-//   });
-// });
+  // Home and overview
+  if (pathname === '/' || pathname === '/overview') {
+    response.writeHead(200, {
+      'content-type': 'text/html',
+    });
 
-// console.log("first");
+    const cardsHtml = products.map((el) => replaceTemplate(tempCard, el)).join('');
+    const output = tempOverview.replace('{%PRODUCT_CARDS%}', cardsHtml);
+    response.end(output);
 
-const http = require("http");
+    // Product
+  } else if (pathname === '/product') {
+    const product = products.find((pro) => pro.id === +query.id);
+    response.writeHead(200, {
+      'content-type': 'text/html',
+    });
+    const output = replaceTemplate(tempProduct, product);
+    response.end(output);
 
-const server = http.createServer((request, response) => {
-  console.log("request", request);
-  response.end("Hello from server!");
+    //API
+  } else if (pathname === '/api') {
+    response.writeHead(200, {
+      'Content-type': 'application/json',
+    });
+    response.end(data);
+
+    // Not found
+  } else {
+    response.writeHead(404, {
+      'Content-type': 'text/html',
+      'my-own-header': 'hello-header!',
+    });
+    response.end('<h1>Page not found!</h1>');
+  }
 });
 
-server.listen(8000, "127.0.0.1", () => {
-  console.log("Listening to requests on http://127.0.0.1:8000 ");
+server.listen(8000, '127.0.0.1', () => {
+  console.log('Listening to requests on http://127.0.0.1:8000 ');
 });
