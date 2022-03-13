@@ -1,10 +1,19 @@
+// core
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
-const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
-const products = JSON.parse(data);
+// third party
 
+const slugify = require('slugify');
+
+// own
 const replaceTemplate = require('./modules/replaceTemplate');
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const dataObj = JSON.parse(data);
+
+const products = dataObj.map((el) => {
+  return { ...el, slug: slugify(el.productName, { lower: true }) };
+});
 
 const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
 const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
@@ -25,7 +34,7 @@ const server = http.createServer((req, response) => {
 
     // Product
   } else if (pathname === '/product') {
-    const product = products.find((pro) => pro.id === +query.id);
+    const product = products.find((pro) => pro.slug === query.slug);
     response.writeHead(200, {
       'content-type': 'text/html',
     });

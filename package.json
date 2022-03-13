@@ -1,13 +1,23 @@
 {
-  "name": "farm",
+  "name": "node-farm",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
-  "scripts": {},
+  "scripts": {
+    "start": "nodemon index.js"
+  },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Mostafa Bodagh Abadi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mosi3883/node-farm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mosi3883/node-farm/issues"
+  },
+  "homepage": "https://github.com/mosi3883/node-farm#readme",
+  "description": ""
 }

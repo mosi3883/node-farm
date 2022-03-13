@@ -7,6 +7,6 @@ module.exports = function (temp, product) {
     .replace(/{%NUTRIENTS%}/g, product.nutrients)
     .replace(/{%QUANTITY%}/g, product.quantity)
     .replace(/{%DESCRIPTION%}/g, product.description)
-    .replace(/{%ID%}/g, product.id)
+    .replace(/{%SLUG%}/g, product.slug)
     .replace(/{%NOT_ORGANIC%}/g, product.organic ? '' : 'not-organic');
 };
